@@ -3,10 +3,10 @@ var ag = af.global();
 
 
 class jQueryAjax extends Op {
-  constructor (name, ops) {super(name, ops);}
+  constructor (name, ops, referrerOp) {super(name, ops, referrerOp);}
 
-  def (successOp=null, failOp=null) {
-    var constOp = this.refOps()[0];
+  def (successOp=null, failOp=null, constOp=null) {
+    var self = this;
     var dict = constOp.getAction();
     $.ajax({
       url: dict.url,
@@ -14,15 +14,15 @@ class jQueryAjax extends Op {
       dataType: 'json',
       data: dict.data
     }).success(data => {
-      var c = new Const({data: data});
+      var c = new Const({data: data}, 'fetchedData');
       if (successOp) {
-        var op = new successOp(null, [c]);
+        var op = new successOp('success', [c], self);
         op.run();
       }
     }).fail(data => {
-      var c = new Const({data: data});
+      var c = new Const({data: data}, 'fetchedData');
       if (failOp) {
-        var op = new failOp(null, [c]);
+        var op = new failOp('failed', [c], self);
         op.run();
       }
     });
@@ -30,46 +30,48 @@ class jQueryAjax extends Op {
 }
 
 class PrintOp extends Op {
-  constructor (name, ops) {super(name, ops);}
+  constructor (name, ops, referrerOp) {super(name, ops, referrerOp);}
 
   def () {
-
     // 参照元のOpのActionを見る
     var t = 0;
     var refOps = this.refOps();
+    console.log('>>', t);
     for (var i = 0; i < refOps.length; i++) {
       var a = refOps[i].getAction();
       if (a) t += a.num;
-      console.log('>>', a);
     }
-
     t += 1;
+    console.log('>>', t);
+
+    var c = new Const({
+      url: 'http://daiiz-apps.appspot.com/sb/p/a',
+      method: 'POST',
+      data: {'a': 'A'}
+    }, 'requestAPI');
+    
+    this.addScope(c);
 
     // 非同期処理の書き方
     this.async(
-      new jQueryAjax('MyAjaxOp', [
-        new Const({
-          url: 'http://daiiz-apps.appspot.com/sb/p/a',
-          method: 'POST',
-          data: {'a': 'A'}
-        })
-      ]), Log, Log);
+      new jQueryAjax('MyAjaxOp', [c], this), Log, Log);
     this.storeAction({'num': t});
   }
 }
 
-var printOp1 = new PrintOp('SubPrintOp');
-var printOp2 = new PrintOp('SubPrintOp');
+var const1 = new Const({'num': 1});
+var const2 = new Const({'num': 1});
 
-var main1 = new PrintOp('MainPrintOp', [printOp1, printOp2]);
+var main1 = new PrintOp('MainPrintOp', [const1, const2]);
 var main2 = new PrintOp('MainPrintOp', [main1]);
 
-af.group('print', [main1, main2]);
+af.scope('print', [main1, main2]);
 
 
-AF_MODE_ANALYSIS = true;
-ag.print[0].run();
-console.info('!', ag.print[0].getAction());
+AF_MODE_ANALYSIS = false;
+main1.run();
+//ag.print[1].run();
+//console.info('!', ag.print[0].getAction());
 
-console.log(AF_OP_GRAPH, AF_GROUP_NAME_TABLE, AF_OP_NAME_TABLE);
-renderStaticGraph(af);
+console.log(AF_OP_GRAPH);
+renderStaticGraph();

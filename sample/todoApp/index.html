@@ -2,8 +2,10 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>ToDo App</title>
+    <title>ActionFlow</title>
     <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="../../actionboard/actionflow.css"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <script src="../libs/jquery.js"></script>
 
     <script src="../../bower_components/d3/d3.js"></script>
@@ -14,7 +16,7 @@
     <style>
     text {
       font-weight: 300;
-      font-family: "Helvetica Neue", Helvetica, Arial, sans-serf;
+      font-family: 'Noto Sans Japanese';
       font-size: 10pt;
     }
 
@@ -30,7 +32,12 @@
     }
 
     .node text {
+      cursor: pointer;
       pointer-events: none;
+    }
+
+    text {
+      cursor: pointer;
     }
 
     ellipse {
@@ -43,6 +50,14 @@
     </style>
   </head>
   <body>
+    <div id="head">
+      <div id="title">
+        ActionFlow
+      </div>
+      <div id="btns">
+        <i class="material-icons" id="btn-reload">refresh</i>
+      </div>
+    </div>
     <div id="app_root">
 
     </div>

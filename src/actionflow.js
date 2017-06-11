@@ -41,8 +41,8 @@ class ActionFlow {
     AF_OP_GROUPS.push(groupName);
   }
 
-  scope () {
-
+  scope (groupName, ops) {
+    this.group(groupName, ops);
   }
 }
 
@@ -55,11 +55,17 @@ class Op {
     this.action = null;
     this.type = 'op';
     this.__id__ = `Op_${Math.floor(Math.random() * 10000000000)}`;
-    if (referrerOp) this.argOps.push(referrerOp);
+    this.scope = [];
+
     AF_OP_GRAPH[this.name] = {
       op: this,
       refOps: this.argOps
     };
+
+    if (referrerOp) {
+      this.argOps.push(referrerOp);
+      AF_OP_GRAPH[this.name].group = referrerOp.group();
+    }
   }
 
   identifier () {
@@ -92,6 +98,12 @@ class Op {
     return actions;
   }
 
+  group () {
+    var opId = this.identifier();
+    var group = AF_OP_GRAPH[opId].group;
+    return group;
+  }
+
   storeAction (action={}) {
     this.action = new Action(action);
   }
@@ -101,13 +113,30 @@ class Op {
     return this.action;
   }
 
+  addScope (op) {
+    var opId = op.identifier();
+    AF_OP_GRAPH[opId].group = AF_OP_GRAPH[this.identifier()].group;
+  }
+
   // func: 処理内容
   // op: 処理完了後の遷移先Op
   // callbackSuccessOp, callbackFailOp: Opの定義
   async (op, callbackSuccessOp, callbackFailOp, callbackName='Async') {
     var groupName = afOrignalName(callbackName, AF_GROUP_NAME_TABLE);
-    AF_OP_GRAPH[op.identifier()].group = groupName;
-    AF_OP_GROUPS.push(groupName);
+    var opId = op.identifier();
+    if (!AF_OP_GRAPH[opId]) {
+      AF_OP_GRAPH[opId].group = groupName;
+      AF_OP_GROUPS.push(groupName);
+    }else {
+      // グループの所属の更新
+      var oldGroupName = AF_OP_GRAPH[opId].group;
+      AF_OP_GRAPH[opId].group = groupName;
+      AF_OP_GRAPH[groupName] = {
+        group: oldGroupName,
+        op: null
+      };
+      AF_OP_GROUPS.push(groupName);
+    }
     if (AF_MODE_ANALYSIS) {
 
       return;

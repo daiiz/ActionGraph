@@ -27,7 +27,7 @@ var addEdge = function (g, opFrom, opTo, level) {
   }else {
     actionKeys = `{${actionKeys.join(', ')}}`;
   }
-  
+
   g.setEdge(opFromId, opTo.identifier(), {
     label: actionKeys,
     style: `stroke: #555; stroke-width: ${level}px; fill: none;`
@@ -45,7 +45,7 @@ var renderStaticGraph = function () {
     g.setNode(groupName, {
       label: groupName,
       clusterLabelPos: 'top',
-      style: 'fill: #fafafa; stroke: #9E9E9E; stroke-width: 4px; rx:5; ry:5;'
+      style: `fill: #fafafa; stroke: #9E9E9E; stroke-width: 4px; rx:5; ry:5; opacity: 0.93;`
     });
   }
 
@@ -54,9 +54,15 @@ var renderStaticGraph = function () {
   for (var i = 0; i < opNames.length; i++) {
     var opInfo = AF_OP_GRAPH[opNames[i]];
     var op = opInfo.op;
-    var opId = op.identifier();
-
     var opGroupName = opInfo.group;
+    if (op === null) {
+      if (opGroupName) {
+        var childGroupName = opNames[i];
+        g.setParent(childGroupName, opGroupName);
+      }
+      continue;
+    }
+    var opId = op.identifier();
     var refOps = opInfo.refOps;
 
     if (opGroupName) {

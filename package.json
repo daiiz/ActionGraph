@@ -1,0 +1,23 @@
+{
+  "name": "action-flow",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "dagre": "^0.7.4"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/daiz713/ActionFlow.git"
+  },
+  "author": "daiiz",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/daiz713/ActionFlow/issues"
+  },
+  "homepage": "https://github.com/daiz713/ActionFlow#readme"
+}

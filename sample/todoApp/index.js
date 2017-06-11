@@ -58,11 +58,18 @@ class PrintOp extends Op {
   }
 }
 
-var printOp = new PrintOp('SubPrintOp');
-ag.print = new PrintOp('MyPrintOp', [printOp, printOp]);
+var printOp1 = new PrintOp('SubPrintOp');
+var printOp2 = new PrintOp('SubPrintOp');
 
-console.info(af, ag);
-console.log(ag.print);
+var main1 = new PrintOp('MainPrintOp', [printOp1, printOp2]);
+var main2 = new PrintOp('MainPrintOp', [main1]);
 
-//ag.print.run();
-console.info('!', ag.print.getAction());
+af.group('print', [main1, main2]);
+
+
+AF_MODE_ANALYSIS = true;
+ag.print[0].run();
+console.info('!', ag.print[0].getAction());
+
+console.log(AF_OP_GRAPH, AF_GROUP_NAME_TABLE, AF_OP_NAME_TABLE);
+renderStaticGraph(af);

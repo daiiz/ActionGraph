@@ -1,5 +1,21 @@
 var AF_OP_NAME = 'Op';
 var AF_CONST_OP_NAME = 'ConstOp';
+var AF_MODE_ANALYSIS = false;
+
+var AF_OP_NAME_TABLE = {};
+var AF_GROUP_NAME_TABLE = {};
+
+var AF_OP_GRAPH = {};
+
+var afOrignalName = function (name, table) {
+  if (table[name] === undefined) {
+    table[name] = 0;
+  }else {
+    table[name] += 1;
+    name += '_' + table[name];
+  }
+  return name;
+};
 
 class ActionFlow {
   constructor () {
@@ -11,6 +27,18 @@ class ActionFlow {
     return this.__global__;
   }
 
+  group (groupName, ops) {
+    groupName = afOrignalName(groupName, AF_GROUP_NAME_TABLE);
+    var globalGroup = this.global();
+    if (!globalGroup[groupName]) globalGroup[groupName] = [];
+    for (var i = 0; i < ops.length; i++) {
+      var op = ops[i];
+      var opId = op.identifier();
+      AF_OP_GRAPH[opId].group = groupName;
+      globalGroup[groupName].push(op);
+    }
+  }
+
   action () {
 
   }
@@ -18,15 +46,16 @@ class ActionFlow {
 
 class Op {
   constructor (name='Op', ops=[]) {
-    this.name = name;
+    this.name = afOrignalName(name, AF_OP_NAME_TABLE);
     this.argOps = ops;
     // 定義された内容を実行した結果が格納される
     this.action = null;
     this.__id__ = `Op_${Math.floor(Math.random() * 10000000000)}`;
+    AF_OP_GRAPH[this.name] = {};
   }
 
   identifier () {
-    return (this.name === AF_OP_NAME || this.name === AF_CONST_OP_NAME) ? this.__id__ : this.name;
+    return this.name;
   }
 
   run (recursive=false) {
@@ -62,9 +91,13 @@ class Op {
 
   // func: 処理内容
   // op: 処理完了後の遷移先Op
-  async (op, callbackSuccessOp, callbackFailOp) {
+  async (op, callbackSuccessOp, callbackFailOp, callbackName='Async') {
+    AF_OP_GRAPH[op.identifier()].group = afOrignalName(callbackName, AF_GROUP_NAME_TABLE);
+    if (AF_MODE_ANALYSIS) {
+      //console.info(op, callbackSuccessOp, callbackFailOp)
+      return;
+    }
     if (!op) return;
-    console.info(op);
     op.def(callbackSuccessOp, callbackFailOp);
   }
 

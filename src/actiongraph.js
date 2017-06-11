@@ -2,13 +2,15 @@
 
 var addOp = function (g, opName, level, opType) {
   var fill = '#fff';
+  var stroke = '#9E9E9E';
   if (opType === 'const') {
     fill = '#CFD8DC';
+    stroke = '#78909C';
   }
   g.setNode(opName, {
     shape: 'ellipse',
     label: opName,
-    style: `fill: ${fill}; stroke: #555; stroke-width: ${level}px;`
+    style: `fill: ${fill}; stroke: ${stroke}; stroke-width: ${level}px;`
   });
   return g;
 };
@@ -23,14 +25,16 @@ var addEdge = function (g, opFrom, opTo, level) {
   }
 
   if (actionKeys.length === 0) {
+    level = 1;
     actionKeys = '';
   }else {
-    actionKeys = `{${actionKeys.join(', ')}}`;
+    level = 1 + (actionKeys.length / 2);
+    actionKeys = `${actionKeys.join(', ')}`;
   }
 
   g.setEdge(opFromId, opTo.identifier(), {
     label: actionKeys,
-    style: `stroke: #555; stroke-width: ${level}px; fill: none;`
+    style: `stroke: #9E9E9E; stroke-width: ${level}px; fill: none;`
   });
   return g;
 };

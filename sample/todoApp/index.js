@@ -1,6 +1,4 @@
 var af = new ActionFlow();
-var ag = af.global();
-
 
 class jQueryAjax extends Op {
   constructor (name, ops, referrerOp) {super(name, ops, referrerOp);}
@@ -49,12 +47,11 @@ class PrintOp extends Op {
       method: 'POST',
       data: {'a': 'A'}
     }, 'requestAPI');
-    
+
     this.addScope(c);
 
     // 非同期処理の書き方
-    this.async(
-      new jQueryAjax('MyAjaxOp', [c], this), Log, Log);
+    this.async(new jQueryAjax('MyAjaxOp', [c], this), Log, Log);
     this.storeAction({'num': t});
   }
 }
@@ -64,14 +61,11 @@ var const2 = new Const({'num': 1});
 
 var main1 = new PrintOp('MainPrintOp', [const1, const2]);
 var main2 = new PrintOp('MainPrintOp', [main1]);
+var main3 = new PrintOp('MainPrintOp', [main1]);
 
 af.scope('print', [main1, main2]);
+af.scope('iizuka', [main3]);
 
-
-AF_MODE_ANALYSIS = false;
 main1.run();
-//ag.print[1].run();
-//console.info('!', ag.print[0].getAction());
-
-console.log(AF_OP_GRAPH);
+main3.run();
 renderStaticGraph();

@@ -118,8 +118,6 @@ class Op {
     AF_OP_GRAPH[opId].group = AF_OP_GRAPH[this.identifier()].group;
   }
 
-  // func: 処理内容
-  // op: 処理完了後の遷移先Op
   // callbackSuccessOp, callbackFailOp: Opの定義
   async (op, callbackSuccessOp, callbackFailOp, callbackName='Async') {
     var groupName = afOrignalName(callbackName, AF_GROUP_NAME_TABLE);

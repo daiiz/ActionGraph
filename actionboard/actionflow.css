@@ -1,0 +1,39 @@
+@import url(https://fonts.googleapis.com/earlyaccess/notosansjapanese.css);
+body {
+  font-family: 'Noto Sans Japanese', sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #fff;
+}
+
+#actionflow_root {
+  margin-top: 0px;
+}
+
+#head {
+  width: 100%;
+  height: 50px;
+  top: 0px;
+  position: relative;
+  z-index: 1000;
+  background-color: #FFC107;
+  box-shadow: 0 2px 2px 0 rgba(0,0,0,.14),
+              0 3px 1px -2px rgba(0,0,0,.0),
+              0 1px 5px 0 rgba(0,0,0,.1);
+}
+
+#title {
+  display: inline-block;
+  font-size: 20px;
+  padding: 9px;
+  padding-left: 24px;
+  color: #333;
+}
+
+#btns {
+  float: right;
+  padding: 13px;
+  cursor: pointer;
+  color: #424242;
+  padding-right: 24px;
+}

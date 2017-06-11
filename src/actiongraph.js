@@ -1,52 +1,75 @@
 // Create a new directed graph
 
-var addOp = function (g, opName, level) {
+var addOp = function (g, opName, level, opType) {
+  var fill = '#fff';
+  if (opType === 'const') {
+    fill = '#CFD8DC';
+  }
   g.setNode(opName, {
     shape: 'ellipse',
     label: opName,
-    style: `fill: #fff; stroke: #555; stroke-width: ${level}px;`
+    style: `fill: ${fill}; stroke: #555; stroke-width: ${level}px;`
   });
   return g;
 };
 
 var addEdge = function (g, opFrom, opTo, level) {
-  g.setEdge(opFrom, opTo, {
-    label: "{...}",
+  var actions = opTo.refOpActions(true);
+  var opFromId = opFrom.identifier();
+  var action = actions[opFromId];
+  var actionKeys = [];
+  if (action) {
+    actionKeys = Object.keys(action);
+  }
+
+  if (actionKeys.length === 0) {
+    actionKeys = '';
+  }else {
+    actionKeys = `{${actionKeys.join(', ')}}`;
+  }
+  
+  g.setEdge(opFromId, opTo.identifier(), {
+    label: actionKeys,
     style: `stroke: #555; stroke-width: ${level}px; fill: none;`
   });
   return g;
 };
 
-var renderStaticGraph = function (af) {
+var renderStaticGraph = function () {
   var g = new dagreD3.graphlib.Graph({compound:true}).setGraph({});
 
-  var ag = af.global();
-  var groupNames = Object.keys(ag);
-  for (var i = 0; i < groupNames.length; i++) {
-    var groupName = groupNames[i];
-
+  // グループを描画
+  var groups = AF_OP_GROUPS;
+  for (var i = 0; i < groups.length; i++) {
+    var groupName = groups[i];
     g.setNode(groupName, {
       label: groupName,
       clusterLabelPos: 'top',
-      style: 'fill: #fafafa; stroke: #555; stroke-width: 1.5px;'
+      style: 'fill: #fafafa; stroke: #9E9E9E; stroke-width: 4px; rx:5; ry:5;'
     });
+  }
 
-    var rootOps = ag[groupName];
-    for (var j = 0; j < rootOps.length; j++) {
-      var rootOp = rootOps[j];
+  // Opを描画
+  var opNames = Object.keys(AF_OP_GRAPH);
+  for (var i = 0; i < opNames.length; i++) {
+    var opInfo = AF_OP_GRAPH[opNames[i]];
+    var op = opInfo.op;
+    var opId = op.identifier();
 
-      // add rootOp
-      var rootOpId = rootOp.identifier();
-      g = addOp(g, rootOpId, 2);
-      //g.setParent(rootOpId, groupName);
+    var opGroupName = opInfo.group;
+    var refOps = opInfo.refOps;
 
-      // add argOps
-      var argOps = rootOp.refOps();
-      for (var k = 0; k < argOps.length; k++) {
-        var argOp = argOps[k];
-        var argOpId = argOp.identifier();
-        g = addOp(g, argOpId, 1);
-        g = addEdge(g, argOpId, rootOpId, 1.5);
+    if (opGroupName) {
+      g = addOp(g, opId, 2, op.type);
+      g.setParent(opId, opGroupName);
+    }else {
+      g = addOp(g, opId, 1, op.type);
+    }
+
+    if (refOps) {
+      for (var j = 0; j < refOps.length; j++) {
+        var refOp = refOps[j];
+        g = addEdge(g, refOp, op, 1.5);
       }
     }
   }
@@ -82,3 +105,7 @@ var drawGraph = function (g) {
     .scale(initialScale)
     .event(svg);
 };
+
+$('#btn-reload').on('click', function () {
+  renderStaticGraph();
+});

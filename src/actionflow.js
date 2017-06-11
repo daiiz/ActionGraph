@@ -6,6 +6,7 @@ var AF_OP_NAME_TABLE = {};
 var AF_GROUP_NAME_TABLE = {};
 
 var AF_OP_GRAPH = {};
+var AF_OP_GROUPS = [];
 
 var afOrignalName = function (name, table) {
   if (table[name] === undefined) {
@@ -37,21 +38,28 @@ class ActionFlow {
       AF_OP_GRAPH[opId].group = groupName;
       globalGroup[groupName].push(op);
     }
+    AF_OP_GROUPS.push(groupName);
   }
 
-  action () {
+  scope () {
 
   }
 }
 
 class Op {
-  constructor (name='Op', ops=[]) {
+  constructor (name='Op', ops=[], referrerOp=null) {
     this.name = afOrignalName(name, AF_OP_NAME_TABLE);
+    this.referrerOp = referrerOp;
     this.argOps = ops;
     // 定義された内容を実行した結果が格納される
     this.action = null;
+    this.type = 'op';
     this.__id__ = `Op_${Math.floor(Math.random() * 10000000000)}`;
-    AF_OP_GRAPH[this.name] = {};
+    if (referrerOp) this.argOps.push(referrerOp);
+    AF_OP_GRAPH[this.name] = {
+      op: this,
+      refOps: this.argOps
+    };
   }
 
   identifier () {
@@ -62,20 +70,24 @@ class Op {
     this.def();
   }
 
-  def (successOp, failOp) {}
+  def (successOp, failOp, constOp) {}
 
   refOps () {
     return this.argOps;
   }
 
-  refOpActions () {
+  refOpActions (skipNull) {
     var actions = {};
     var refOps = this.refOps();
     for (var i = 0; i < refOps.length; i++) {
       var op = refOps[i];
       var a = op.getAction();
       var name = op.identifier();
-      actions[name] = a;
+      if (skipNull) {
+        if (a !== null) actions[name] = a;
+      }else {
+        actions[name] = a;
+      }
     }
     return actions;
   }
@@ -91,14 +103,17 @@ class Op {
 
   // func: 処理内容
   // op: 処理完了後の遷移先Op
+  // callbackSuccessOp, callbackFailOp: Opの定義
   async (op, callbackSuccessOp, callbackFailOp, callbackName='Async') {
-    AF_OP_GRAPH[op.identifier()].group = afOrignalName(callbackName, AF_GROUP_NAME_TABLE);
+    var groupName = afOrignalName(callbackName, AF_GROUP_NAME_TABLE);
+    AF_OP_GRAPH[op.identifier()].group = groupName;
+    AF_OP_GROUPS.push(groupName);
     if (AF_MODE_ANALYSIS) {
-      //console.info(op, callbackSuccessOp, callbackFailOp)
+
       return;
     }
     if (!op) return;
-    op.def(callbackSuccessOp, callbackFailOp);
+    op.def(callbackSuccessOp, callbackFailOp, op.refOps()[0]);
   }
 
   /* 解析用 */
@@ -115,9 +130,10 @@ class Action {
 
 // builtin-op
 class Const extends Op {
-  constructor (dict, name) {
-    if (!name) name = 'ConstOp';
-    super(name, []);
+  constructor (dict, name, referrerOp) {
+    if (!name) name = afOrignalName('ConstOp', AF_OP_NAME_TABLE);
+    super(name, [], referrerOp);
+    this.type = 'const';
     this.def(dict);
   }
 
@@ -127,9 +143,9 @@ class Const extends Op {
 }
 
 class Log extends Op {
-  constructor (name, ops) {
-    if (!name) name = 'LoggerOp';
-    super(name, ops);
+  constructor (name, ops, referrerOp) {
+    if (!name) name = afOrignalName('LoggerOp', AF_OP_NAME_TABLE);
+    super(name, ops, referrerOp);
   }
 
   def () {

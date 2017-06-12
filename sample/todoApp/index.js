@@ -61,11 +61,11 @@ var const2 = new Const({'num': 1});
 
 var main1 = new PrintOp('MainPrintOp', [const1, const2]);
 var main2 = new PrintOp('MainPrintOp', [main1]);
-var main3 = new PrintOp('MainPrintOp', [main1]);
+//var main3 = new PrintOp('MainPrintOp', [main1]);
 
 af.scope('print', [main1, main2]);
-af.scope('iizuka', [main3]);
+//af.scope('iizuka', [main3]);
 
 main1.run();
-main3.run();
+//main3.run();
 renderStaticGraph();

@@ -34,7 +34,8 @@ var addEdge = function (g, opFrom, opTo, level) {
 
   g.setEdge(opFromId, opTo.identifier(), {
     label: actionKeys,
-    style: `stroke: #9E9E9E; stroke-width: ${level}px; fill: none;`
+    style: `stroke: #9E9E9E; stroke-width: ${level}px; fill: none;`,
+    lineInterpolate: 'basis'
   });
   return g;
 };

@@ -1,21 +1,30 @@
 // Create a new directed graph
+var THEME_COLOR = '#FFC107';
 
 var addOp = function (g, opName, level, opType) {
   var fill = '#fff';
   var stroke = '#9E9E9E';
+  var shape = 'ellipse';
+  var r = '';
   if (opType === 'const') {
     fill = '#CFD8DC';
     stroke = '#78909C';
   }
+  if (opType === 'trigger') {
+    shape = 'circle';
+    fill = THEME_COLOR;
+    r = 'r: 9;';
+  }
   g.setNode(opName, {
-    shape: 'ellipse',
+    shape: shape,
     label: opName,
-    style: `fill: ${fill}; stroke: ${stroke}; stroke-width: ${level}px;`
+    style: `fill: ${fill}; stroke: ${stroke}; stroke-width: ${level}px; ${r}`
   });
   return g;
 };
 
-var addEdge = function (g, opFrom, opTo, level) {
+var addEdge = function (g, opFrom, opTo, level, stroke='#9E9E9E') {
+  var lev = level;
   var actions = opTo.refOpActions(true);
   var opFromId = opFrom.identifier();
   var action = actions[opFromId];
@@ -31,10 +40,17 @@ var addEdge = function (g, opFrom, opTo, level) {
     level = 1 + (actionKeys.length / 2);
     actionKeys = `${actionKeys.join(', ')}`;
   }
+  if (lev) level = lev;
+
+  // 特殊Op
+  if (opFrom.type === 'trigger') {
+    actionKeys = opFrom.getAction()['event'] || '';
+  }
 
   g.setEdge(opFromId, opTo.identifier(), {
     label: actionKeys,
-    style: `stroke: #9E9E9E; stroke-width: ${level}px; fill: none;`,
+    style: `stroke: ${stroke}; stroke-width: ${level}px; fill: none;`,
+    arrowheadStyle: `fill: ${stroke}; stroke: ${stroke};`,
     lineInterpolate: 'basis'
   });
   return g;
@@ -77,12 +93,24 @@ var renderStaticGraph = function () {
       g = addOp(g, opId, 1, op.type);
     }
 
+    // 参照されているOpsを見てエッジを追加
     if (refOps) {
       for (var j = 0; j < refOps.length; j++) {
         var refOp = refOps[j];
         g = addEdge(g, refOp, op, 1.5);
       }
     }
+
+    // 特殊Op (Trigger)
+    // 参照先のOpsを見てエッジを追加
+    if (op.__opsTo__) {
+      var opsTo = op.__opsTo__;
+      for (var j = 0; j < opsTo.length; j++) {
+        var opTo = opsTo[j];
+        g = addEdge(g, op, opTo, 2.5, THEME_COLOR);
+      }
+    }
+
   }
 
   drawGraph(g);

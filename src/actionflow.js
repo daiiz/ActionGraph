@@ -179,3 +179,20 @@ class Log extends Op {
     console.dir(this.refOpActions());
   }
 }
+
+// ops: 接続先のOp
+class Trigger extends Op {
+  constructor (dict, ops=[]) {
+    name = dict.selector || 'Trigger';
+    name = afOrignalName(name, AF_OP_NAME_TABLE);
+    super(name, [], null);
+
+    this.__opsTo__ = ops;
+    this.type = 'trigger';
+    this.def(dict);
+  }
+
+  def (triggerDict) {
+    this.storeAction(triggerDict);
+  }
+}

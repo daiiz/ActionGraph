@@ -37,3 +37,37 @@ body {
   color: #424242;
   padding-right: 24px;
 }
+
+text {
+  font-weight: 300;
+  font-family: 'Noto Sans Japanese';
+  font-size: 9pt;
+}
+
+.node rect {
+  stroke: #333;
+  fill: #fff;
+}
+
+.edgePath path {
+  stroke: #9E9E9E;
+  fill: #9E9E9E;
+  stroke-width: 1.5px;
+}
+
+.node text {
+  cursor: pointer;
+  pointer-events: none;
+}
+
+text {
+  cursor: pointer;
+}
+
+ellipse, circle {
+  cursor: pointer;
+}
+
+ellipse:hover {
+  fill: #FFECB3 !important;
+}

@@ -1,6 +1,7 @@
 var AF_OP_NAME = 'Op';
 var AF_CONST_OP_NAME = 'ConstOp';
 var AF_MODE_ANALYSIS = false;
+var AF_ROOT = '#actionflow_root';
 
 var AF_OP_NAME_TABLE = {};
 var AF_GROUP_NAME_TABLE = {};
@@ -22,6 +23,31 @@ class ActionFlow {
   constructor () {
     this.__version__ = '0.0.1';
     this.__global__ = {};
+    this.bindEvents();
+  }
+
+  bindEvents () {
+    var detectNodeLabel = function ($e) {
+      var styleProps = $e.attr('style').split(';');
+      var label = null;
+      for (var i = 0; i < styleProps.length; i++) {
+        var prop = styleProps[i].split(':');
+        if (prop[0].trim() === 'data-label') {
+          label = prop[1].trim();
+        }
+      }
+      return label
+    };
+
+    $(AF_ROOT).on('click', 'ellipse', e => {
+      var $e = $(e.target).closest('ellipse');
+      console.info(detectNodeLabel($e));
+    });
+
+    $(AF_ROOT).on('click', 'circle', e => {
+      var $e = $(e.target).closest('circle');
+      console.info(detectNodeLabel($e));
+    });
   }
 
   global () {

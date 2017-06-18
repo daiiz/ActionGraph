@@ -18,7 +18,7 @@ var addOp = function (g, opName, level, opType) {
   g.setNode(opName, {
     shape: shape,
     label: opName,
-    style: `fill: ${fill}; stroke: ${stroke}; stroke-width: ${level}px; ${r}`
+    style: `fill: ${fill}; stroke: ${stroke}; stroke-width: ${level}px; data-label: ${opName}; ${r}`
   });
   return g;
 };

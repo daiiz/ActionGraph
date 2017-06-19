@@ -56,6 +56,13 @@ var addEdge = function (g, opFrom, opTo, level, stroke='#9E9E9E') {
   return g;
 };
 
+var initGraphBoard = function () {
+  var $panel = $('#actionflow_panel');
+  $panel.resizable({
+    handles: 'e'
+  });
+};
+
 var renderStaticGraph = function () {
   var g = new dagreD3.graphlib.Graph({compound:true}).setGraph({});
 
@@ -147,4 +154,8 @@ var drawGraph = function (g) {
 
 $('#btn-reload').on('click', function () {
   renderStaticGraph();
+});
+
+$(function () {
+  initGraphBoard();
 });

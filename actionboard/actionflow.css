@@ -4,22 +4,24 @@ body {
   margin: 0;
   padding: 0;
   background-color: #fff;
+  overflow: hidden;
 }
 
 #actionflow_root {
-  margin-top: 0px;
+  margin-top: 50px;
 }
 
 #head {
   width: 100%;
   height: 50px;
   top: 0px;
-  position: relative;
+  position: fixed;
   z-index: 1000;
   background-color: #FFC107;
   box-shadow: 0 2px 2px 0 rgba(0,0,0,.14),
               0 3px 1px -2px rgba(0,0,0,.0),
               0 1px 5px 0 rgba(0,0,0,.1);
+  opacity: 0.93;
 }
 
 #title {
@@ -38,6 +40,40 @@ body {
   padding-right: 24px;
 }
 
+#actionflow_panel {
+  position: fixed !important;
+  top: 0px;
+  left: 0px;
+  height: 100%;
+  width: 200px;
+  box-sizing: border-box;
+  background-color: #fafafa;
+  opacity: 0.91;
+  box-shadow: 0 2px 2px 0 rgba(0,0,0,.14),
+              0 3px 1px -2px rgba(0,0,0,.0),
+              0 1px 5px 0 rgba(0,0,0,.1);
+  padding-top: 50px;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.box_head {
+  padding: 3px;
+  padding-left: 9px;
+  font-size: 10pt;
+  background-color: #FFE57F;
+  cursor: pointer;
+  margin-bottom: 1px;
+  box-sizing: border-box;
+}
+
+.box_body {
+  padding: 3px;
+  padding-left: 12px;
+  font-size: 8pt;
+}
+
+/* SVG */
 text {
   font-weight: 300;
   font-family: 'Noto Sans Japanese';

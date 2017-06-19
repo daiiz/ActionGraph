@@ -2,10 +2,12 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>ToDoApp</title>
+    <title>ActionFlow</title>
     <link rel="stylesheet" href="index.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="../libs/jquery-ui.min.css">
     <script src="../libs/jquery.js"></script>
+    <script src="../libs/jquery-ui.min.js"></script>
 
     <script src="../../bower_components/d3/d3.js"></script>
     <script src="../../bower_components/lodash/lodash.js"></script>
@@ -31,6 +33,32 @@
       <svg id="af_svg">
         <g></g>
       </svg>
+      <div id="actionflow_panel">
+        <div class="panel_box">
+          <div class="box_head">
+            Operation
+          </div>
+          <div id="box-operation" class="box_body">
+            ...
+          </div>
+        </div>
+        <div class="panel_box">
+          <div class="box_head">
+            Action
+          </div>
+          <div id="box-action" class="box_body">
+            ...
+          </div>
+        </div>
+        <div class="panel_box">
+          <div class="box_head">
+            DOM
+          </div>
+          <div id="box-dom" class="box_body">
+            ...
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- ActionFlow -->

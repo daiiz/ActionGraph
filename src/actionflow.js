@@ -27,6 +27,22 @@ class ActionFlow {
     this.bindEvents();
   }
 
+  report (opNodeLabel) {
+    var $reportBoxOp = $('#box-operation');
+    var $reportBoxAction = $('#box-action');
+    var $reportBoxDom = $('#box-dom');
+
+    var selectors = AF_DOM_TABLE[opNodeLabel] || [];
+    $reportBoxOp.text(opNodeLabel);
+
+    
+    for (var i = 0; i < selectors.length; i++) {
+      var $elem = $(selectors[i]);
+      console.info($elem);
+    }
+
+  }
+
   bindEvents () {
     var detectNodeLabel = function ($e) {
       var styleProps = $e.attr('style').split(';');
@@ -42,12 +58,12 @@ class ActionFlow {
 
     $(AF_ROOT).on('click', 'ellipse', e => {
       var $e = $(e.target).closest('ellipse');
-      console.info(detectNodeLabel($e));
+      this.report(detectNodeLabel($e));
     });
 
     $(AF_ROOT).on('click', 'circle', e => {
       var $e = $(e.target).closest('circle');
-      console.info(detectNodeLabel($e));
+      this.report(detectNodeLabel($e));
     });
   }
 
@@ -73,7 +89,7 @@ class ActionFlow {
     var binderName = binderOp.name;
     if (!AF_DOM_TABLE[binderName]) AF_DOM_TABLE[binderName] = [];
     if (AF_DOM_TABLE[binderName].indexOf(selector) === -1) {
-      AF_DOM_TABLE[binderName].push(selector);  
+      AF_DOM_TABLE[binderName].push(selector);
     }
     return $(selector);
   }

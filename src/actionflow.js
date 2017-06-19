@@ -168,6 +168,7 @@ class Op {
     this.__desc__ = '...';
     this.__id__ = `Op_${Math.floor(Math.random() * 10000000000)}`;
     this.scope = [];
+    this.triggerOptions = {}
 
     AF_OP_GRAPH[this.name] = {
       op: this,

@@ -8,6 +8,7 @@ var AF_GROUP_NAME_TABLE = {};
 
 var AF_OP_GRAPH = {};
 var AF_OP_GROUPS = [];
+var AF_DOM_TABLE = {};
 
 var afOrignalName = function (name, table) {
   if (table[name] === undefined) {
@@ -65,6 +66,16 @@ class ActionFlow {
       globalGroup[groupName].push(op);
     }
     AF_OP_GROUPS.push(groupName);
+  }
+
+  $ (selector, binderOp) {
+    // 未登録ならば登録
+    var binderName = binderOp.name;
+    if (!AF_DOM_TABLE[binderName]) AF_DOM_TABLE[binderName] = [];
+    if (AF_DOM_TABLE[binderName].indexOf(selector) === -1) {
+      AF_DOM_TABLE[binderName].push(selector);  
+    }
+    return $(selector);
   }
 
   scope (groupName, ops) {
@@ -220,5 +231,7 @@ class Trigger extends Op {
 
   def (triggerDict) {
     this.storeAction(triggerDict);
+    var selector = triggerDict.selector;
+    var $elem = af.$(selector, this);
   }
 }

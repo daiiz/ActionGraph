@@ -73,6 +73,39 @@ body {
   font-size: 8pt;
 }
 
+.action-key, .action-val {
+  background-color: #fefefe;
+  border-radius: 0px;
+  padding-left: 3px;
+  padding-right: 3px;
+}
+
+.action-key {
+  background-color: #EEEEEE;
+  cursor: pointer;
+}
+
+.action-key:hover {
+  background-color: #FFE57F;
+}
+
+.af-elem, .af-elem-found {
+  display: inline-block;
+  background-color: #EEEEEE;
+  border-radius: 2px;
+  padding-left: 3px;
+  padding-right: 3px;
+  -webkit-user-select: none;
+  user-select: none;
+  cursor: default;
+}
+
+.af-elem-found {
+  cursor: pointer;
+  background-color: #F3E5F5;
+  color: #9C27B0;
+}
+
 /* SVG */
 text {
   font-weight: 300;

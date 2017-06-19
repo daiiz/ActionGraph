@@ -154,6 +154,7 @@ var drawGraph = function (g) {
 
 $('#btn-reload').on('click', function () {
   renderStaticGraph();
+  console.clear();
 });
 
 $(function () {

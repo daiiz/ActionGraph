@@ -2,6 +2,9 @@ var AF_OP_NAME = 'Op';
 var AF_CONST_OP_NAME = 'ConstOp';
 var AF_MODE_ANALYSIS = false;
 var AF_ROOT = '#actionflow_root';
+var DOT_BLANK = '...';
+var AF_TYPE_TRIGGER = 'trigger';
+var AF_TYPE_CONST = 'const';
 
 var AF_OP_NAME_TABLE = {};
 var AF_GROUP_NAME_TABLE = {};
@@ -29,16 +32,49 @@ class ActionFlow {
 
   report (opNodeLabel) {
     var $reportBoxOp = $('#box-operation');
+    var $reportBxDesc = $('#box-desc');
     var $reportBoxAction = $('#box-action');
     var $reportBoxDom = $('#box-dom');
 
     var selectors = AF_DOM_TABLE[opNodeLabel] || [];
-    $reportBoxOp.text(opNodeLabel);
+    var op = AF_OP_GRAPH[opNodeLabel].op;
+    var actions = op.getAction();
 
-    
+    $reportBoxOp.text(opNodeLabel);
+    $reportBxDesc.text(op.getDescription());
+
+    var table = '';
+    if (actions) {
+      var keys = Object.keys(actions);
+      for (var i = 0; i < keys.length; i++) {
+        var key = keys[i];
+        var val = actions[key];
+        // 特殊Opの場合は表示しないパラメータもある
+        if (op.type === AF_TYPE_TRIGGER) {
+          if (key === 'selector') continue;
+        }
+        table += `<tr>
+                    <td class="action-key" data-op="${opNodeLabel}">${key}</td>
+                    <td class="action-val">${val}</td>
+                  </tr>`;
+      }
+      table = `<table classs="action-table">${table}</table>`;
+      $reportBoxAction.html(table);
+    }else {
+      $reportBoxAction.text(DOT_BLANK);
+    }
+
+    $reportBoxDom.html('');
+    if (selectors.length === 0) $reportBoxDom.html(DOT_BLANK);
     for (var i = 0; i < selectors.length; i++) {
       var $elem = $(selectors[i]);
-      console.info($elem);
+      var $e = $(`<div>${selectors[i]}</div>`);
+      if ($elem.length > 0) {
+        $e.addClass('af-elem-found');
+      }else {
+        $e.addClass('af-elem');
+      }
+      $reportBoxDom.append($e);
     }
 
   }
@@ -65,6 +101,26 @@ class ActionFlow {
       var $e = $(e.target).closest('circle');
       this.report(detectNodeLabel($e));
     });
+
+    $(AF_ROOT).on('click', '.action-key', e => {
+      var $e = $(e.target).closest('.action-key');
+      var opName = $e.attr('data-op');
+      var key = $e.text().trim();
+      var op = AF_OP_GRAPH[opName].op;
+      var action = op.getAction();
+      console.info(action[key]);
+    });
+
+    $(AF_ROOT).on('click', '.af-elem-found', e => {
+      var $e = $(e.target).closest('.af-elem-found');
+      var selector = $e.text().trim();
+      var elems = document.querySelectorAll(selector);
+      if (elems.length === 1) {
+        console.log(elems[0]);
+      }else {
+        console.log(elems);
+      }
+    });
   }
 
   global () {
@@ -85,11 +141,13 @@ class ActionFlow {
   }
 
   $ (selector, binderOp) {
-    // 未登録ならば登録
-    var binderName = binderOp.name;
-    if (!AF_DOM_TABLE[binderName]) AF_DOM_TABLE[binderName] = [];
-    if (AF_DOM_TABLE[binderName].indexOf(selector) === -1) {
-      AF_DOM_TABLE[binderName].push(selector);
+    if (binderOp) {
+      // 未登録ならば登録
+      var binderName = binderOp.name;
+      if (!AF_DOM_TABLE[binderName]) AF_DOM_TABLE[binderName] = [];
+      if (AF_DOM_TABLE[binderName].indexOf(selector) === -1) {
+        AF_DOM_TABLE[binderName].push(selector);
+      }
     }
     return $(selector);
   }
@@ -107,6 +165,7 @@ class Op {
     // 定義された内容を実行した結果が格納される
     this.action = null;
     this.type = 'op';
+    this.__desc__ = '...';
     this.__id__ = `Op_${Math.floor(Math.random() * 10000000000)}`;
     this.scope = [];
 
@@ -119,6 +178,14 @@ class Op {
       this.argOps.push(referrerOp);
       AF_OP_GRAPH[this.name].group = referrerOp.group();
     }
+  }
+
+  desc (description='...') {
+    this.__desc__ = description;
+  }
+
+  getDescription () {
+    return this.__desc__;
   }
 
   identifier () {
@@ -213,7 +280,7 @@ class Const extends Op {
   constructor (dict, name, referrerOp) {
     if (!name) name = afOrignalName('ConstOp', AF_OP_NAME_TABLE);
     super(name, [], referrerOp);
-    this.type = 'const';
+    this.type = AF_TYPE_CONST;
     this.def(dict);
   }
 
@@ -241,7 +308,7 @@ class Trigger extends Op {
     super(name, [], null);
 
     this.__opsTo__ = ops;
-    this.type = 'trigger';
+    this.type = AF_TYPE_TRIGGER;
     this.def(dict);
   }
 

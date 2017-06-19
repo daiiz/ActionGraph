@@ -1,7 +1,10 @@
 var af = new ActionFlow();
 
 class jQueryAjax extends Op {
-  constructor (name, ops, referrerOp) {super(name, ops, referrerOp);}
+  constructor (name, ops, referrerOp) {
+    super(name, ops, referrerOp);
+    this.desc('Ajax通信します');
+  }
 
   def (successOp=null, failOp=null, constOp=null) {
     var self = this;
@@ -40,8 +43,8 @@ class PrintOp extends Op {
       if (a) t += a.num;
     }
     t += 1;
-    console.log('>>', t);
 
+    var $elem = af.$('#result', this);
     var c = new Const({
       url: 'http://daiiz-apps.appspot.com/sb/p/a',
       method: 'POST',

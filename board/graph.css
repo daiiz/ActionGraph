@@ -5,6 +5,8 @@ body {
   padding: 0;
   background-color: #fff;
   overflow: hidden;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 #actionflow_root {
@@ -45,7 +47,7 @@ body {
   top: 0px;
   left: 0px;
   height: 100%;
-  width: 200px;
+  width: 160px;
   box-sizing: border-box;
   background-color: #fafafa;
   opacity: 0.91;
@@ -99,8 +101,6 @@ body {
   border-radius: 2px;
   padding-left: 3px;
   padding-right: 3px;
-  -webkit-user-select: none;
-  user-select: none;
   cursor: default;
 }
 

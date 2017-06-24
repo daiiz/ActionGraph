@@ -1,0 +1,23 @@
+{
+  "name": "action-graph",
+  "description": "",
+  "main": "index.js",
+  "authors": [
+    "daiiz"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/daiz713/ActionGraph",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "dagre-d3": "^0.4.17",
+    "jquery": "1.10.2",
+    "jquery-ui": "^1.12.1"
+  }
+}

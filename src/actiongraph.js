@@ -1,3 +1,4 @@
+var PARENT = window;
 var AF_OP_NAME = 'Op';
 var AF_CONST_OP_NAME = 'ConstOp';
 var AF_MODE_ANALYSIS = false;
@@ -6,9 +7,12 @@ var DOT_BLANK = '...';
 var AF_TYPE_TRIGGER = 'trigger';
 var AF_TYPE_CONST = 'const';
 
+var AF_DEFAULT_TRIGGER = 'click';
+
 var AF_OP_NAME_TABLE = {};
 var AF_GROUP_NAME_TABLE = {};
 
+// 描画に必要な情報
 var AF_OP_GRAPH = {};
 var AF_OP_GROUPS = [];
 var AF_DOM_TABLE = {};
@@ -28,6 +32,9 @@ class ActionGraph {
     this.__version__ = '0.0.1';
     this.__global__ = {};
     this.bindEvents();
+    if (window.location.href.endsWith('?dev')) {
+      this.openBoard();
+    }
   }
 
   report (opNodeLabel) {
@@ -67,7 +74,7 @@ class ActionGraph {
     $reportBoxDom.html('');
     if (selectors.length === 0) $reportBoxDom.html(DOT_BLANK);
     for (var i = 0; i < selectors.length; i++) {
-      var $elem = $(selectors[i]);
+      var $elem = $(PARENT).find(selectors[i]);
       var $e = $(`<div>${selectors[i]}</div>`);
       if ($elem.length > 0) {
         $e.addClass('af-elem-found');
@@ -76,7 +83,10 @@ class ActionGraph {
       }
       $reportBoxDom.append($e);
     }
+  }
 
+  openBoard () {
+    window.open('/board/index.html', 'ActionGraphBoard', 'width=850, height=600');
   }
 
   bindEvents () {
@@ -108,7 +118,7 @@ class ActionGraph {
       var key = $e.text().trim();
       var op = AF_OP_GRAPH[opName].op;
       var action = op.getAction();
-      console.info(action[key]);
+      PARENT.console.info('[ActionBoard]', action[key]);
     });
 
     $(AF_ROOT).on('click', '.af-elem-found', e => {
@@ -316,6 +326,14 @@ class Trigger extends Op {
   def (triggerDict) {
     this.storeAction(triggerDict);
     var selector = triggerDict.selector;
-    var $elem = af.$(selector, this);
+    var trig = triggerDict.event || AF_DEFAULT_TRIGGER;
+    var $elem = ag.$(selector, this);
+    if ($elem.length === 0) return;
+    $elem.on(trig, e => {
+      for (var i = 0; i < this.__opsTo__.length; i++) {
+        var op = this.__opsTo__[i];
+        op.run();
+      }
+    });
   }
 }

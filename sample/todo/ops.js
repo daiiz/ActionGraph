@@ -9,7 +9,7 @@ class jQueryAjax extends Op {
     var dict = constOp.getAction();
     $.ajax({
       url: dict.url,
-      type: 'POST',
+      type: dict.method,
       dataType: 'json',
       data: dict.data
     }).success(data => {
@@ -44,8 +44,8 @@ class PrintOp extends Op {
 
     var $elem = ag.$('#result', this);
     var c = new Const({
-      url: 'http://daiiz-apps.appspot.com/sb/p/a',
-      method: 'POST',
+      url: '/sample/sample.json',
+      method: 'GET',
       data: {'a': 'A'}
     }, 'requestAPI');
 

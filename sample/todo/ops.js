@@ -42,7 +42,7 @@ class PrintOp extends Op {
     }
     t += 1;
 
-    var $elem = af.$('#result', this);
+    var $elem = ag.$('#result', this);
     var c = new Const({
       url: 'http://daiiz-apps.appspot.com/sb/p/a',
       method: 'POST',

@@ -27,7 +27,7 @@ class StoreAll extends Op {
     }
     store.notes = notes.reverse();
     localStorage[todoApp.STORE_KEY] = JSON.stringify(store);
-    this.storeAction({notes: [note]});
+    this.storeAction({notes: store.notes});
   }
 }
 

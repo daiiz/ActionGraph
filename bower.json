@@ -18,6 +18,7 @@
   "dependencies": {
     "dagre-d3": "^0.4.17",
     "jquery": "1.10.2",
-    "jquery-ui": "^1.12.1"
+    "jquery-ui": "^1.12.1",
+    "js-codepoints": "dankogai/js-codepoints"
   }
 }

@@ -28,6 +28,9 @@ class StoreAll extends Op {
     store.notes = notes.reverse();
     localStorage[todoApp.STORE_KEY] = JSON.stringify(store);
     this.storeAction({notes: store.notes});
+
+    // あまりよくない?
+    notesOp.storeAction({});
   }
 }
 
@@ -187,7 +190,7 @@ class GetNotes extends Op {
     var res = [];
     var cards = $('.card');
     for (var i = 0; i < cards.length; i++) {
-      var text = $(cards[i]).find('.note').text();
+      var text = this.$(cards[i]).find('.note').text();
       res.push(text);
     }
     this.storeAction({notes: res});

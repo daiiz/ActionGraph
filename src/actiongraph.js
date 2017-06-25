@@ -64,14 +64,18 @@ class ActionGraph {
       var keys = Object.keys(actions);
       for (var i = 0; i < keys.length; i++) {
         var key = keys[i];
-        var val = actions[key];
+        var val = actions[key].toString();
         // 特殊Opの場合は表示しないパラメータもある
         if (op.type === AF_TYPE_TRIGGER) {
           if (key === 'selector') continue;
         }
+        var spans = '';
+        for (var j = 0; j < val.codepoints; j++) {
+          spans += `<span>${val.uCharAt(j)}</span>`;
+        }
         table += `<tr>
                     <td class="action-key" data-op="${opNodeLabel}">${key}</td>
-                    <td class="action-val">${val}</td>
+                    <td class="action-val">${spans}</td>
                   </tr>`;
       }
       table = `<table classs="action-table">${table}</table>`;
@@ -191,6 +195,7 @@ class Op {
     this.__desc__ = '...';
     this.__id__ = `Op_${Math.floor(Math.random() * 10000000000)}`;
     this.opsTo = {}; // 自動設定
+    this.opsFrom = {}; // 自動設定
     this.scope = [];
     this.triggerParams = {}
 
@@ -204,11 +209,19 @@ class Op {
       AF_OP_GRAPH[this.name].group = referrerOp.group();
     }
 
-    // 接続元のopsToをセットする
+    // opsFromを構築する
+    // 接続元のopsToとしてthisをセットする
     for (var i = 0; i < this.argOps.length; i++) {
         var op = this.argOps[i];
+        var opName = op.name;
+        if (!this.opsFrom[opName]) {
+          this.opsFrom[opName] = op;
+        }else {
+          console.warn('同一名称Opへの参照', opName, this.name)
+        }
+
         if (!op.opsTo[name]) {
-          op.opsTo[name] = this;
+          op.opsTo[this.name] = this;
         }else {
           console.warn('同一名称Opへの参照')
         }
@@ -229,6 +242,11 @@ class Op {
   nextOp (opName) {
     if (!opName || opName.length === 0) return this.opsTo;
     return this.opsTo[opName];
+  }
+
+  prevOp (opName) {
+    if (!opName || opName.length === 0) return this.opsFrom;
+    return this.opsFrom[opName];
   }
 
   desc (description='...') {
@@ -376,14 +394,13 @@ class Trigger extends Op {
     var selector = triggerDict.selector;
     var trig = triggerDict.event || AF_DEFAULT_TRIGGER;
     var $elem = this.$(selector);
-    if ($elem.length === 0) return;
 
     if (selector === 'body' && trig === 'load') {
       for (var j = 0; j < this.__opsTo__.length; j++) {
         ag.reservation_ops.push(this.__opsTo__[j]);
       }
     }else {
-      $(window).on(trig, selector, e => {
+      $('body').on(trig, selector, e => {
         for (var i = 0; i < this.__opsTo__.length; i++) {
           var op = this.__opsTo__[i];
           op.triggerParams = e;

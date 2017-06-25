@@ -117,7 +117,6 @@ var renderStaticGraph = function () {
         g = addEdge(g, op, opTo, 2.5, THEME_COLOR);
       }
     }
-
   }
 
   drawGraph(g);

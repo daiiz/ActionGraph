@@ -375,7 +375,7 @@ class Trigger extends Op {
     this.storeAction(triggerDict);
     var selector = triggerDict.selector;
     var trig = triggerDict.event || AF_DEFAULT_TRIGGER;
-    var $elem = ag.$(selector, this);
+    var $elem = this.$(selector);
     if ($elem.length === 0) return;
 
     if (selector === 'body' && trig === 'load') {
@@ -383,7 +383,7 @@ class Trigger extends Op {
         ag.reservation_ops.push(this.__opsTo__[j]);
       }
     }else {
-      $elem.on(trig, e => {
+      $(window).on(trig, selector, e => {
         for (var i = 0; i < this.__opsTo__.length; i++) {
           var op = this.__opsTo__[i];
           op.triggerParams = e;

@@ -6,4 +6,3 @@ var main2 = new PrintOp('MainPrintOp', [main1]);
 
 var button1 = new Trigger({selector: '#button1', event: 'click'}, [main1]);
 ag.scope('print', [main1, main2]);
-//main1.run();

@@ -35,6 +35,15 @@ class ActionGraph {
     if (window.location.href.endsWith('?dev')) {
       this.openBoard();
     }
+    // 実行予約のOps
+    // graph構築が完了後runで実行される
+    this.reservation_ops = [];
+  }
+
+  run () {
+    for (var i = 0; i < this.reservation_ops.length; i++) {
+      this.reservation_ops[i].run();
+    }
   }
 
   report (opNodeLabel) {
@@ -104,7 +113,9 @@ class ActionGraph {
 
     $(AF_ROOT).on('click', 'ellipse', e => {
       var $e = $(e.target).closest('ellipse');
-      this.report(detectNodeLabel($e));
+      var name = detectNodeLabel($e);
+      this.report(name);
+      PARENT.console.log('[ActionBoard]', AF_OP_GRAPH[name].op);
     });
 
     $(AF_ROOT).on('click', 'circle', e => {
@@ -118,7 +129,7 @@ class ActionGraph {
       var key = $e.text().trim();
       var op = AF_OP_GRAPH[opName].op;
       var action = op.getAction();
-      PARENT.console.info('[ActionBoard]', action[key]);
+      PARENT.console.log('[ActionBoard]', action[key]);
     });
 
     $(AF_ROOT).on('click', '.af-elem-found', e => {
@@ -150,6 +161,8 @@ class ActionGraph {
     AF_OP_GROUPS.push(groupName);
   }
 
+  // 非推奨
+  // 代わりにop.$を使う
   $ (selector, binderOp) {
     if (binderOp) {
       // 未登録ならば登録
@@ -177,8 +190,9 @@ class Op {
     this.type = 'op';
     this.__desc__ = '...';
     this.__id__ = `Op_${Math.floor(Math.random() * 10000000000)}`;
+    this.opsTo = {}; // 自動設定
     this.scope = [];
-    this.triggerOptions = {}
+    this.triggerParams = {}
 
     AF_OP_GRAPH[this.name] = {
       op: this,
@@ -189,6 +203,32 @@ class Op {
       this.argOps.push(referrerOp);
       AF_OP_GRAPH[this.name].group = referrerOp.group();
     }
+
+    // 接続元のopsToをセットする
+    for (var i = 0; i < this.argOps.length; i++) {
+        var op = this.argOps[i];
+        if (!op.opsTo[name]) {
+          op.opsTo[name] = this;
+        }else {
+          console.warn('同一名称Opへの参照')
+        }
+    }
+  }
+
+  $ (selector) {
+    var binderOp = this;
+    // 未登録ならば登録
+    var binderName = binderOp.name;
+    if (!AF_DOM_TABLE[binderName]) AF_DOM_TABLE[binderName] = [];
+    if (AF_DOM_TABLE[binderName].indexOf(selector) === -1) {
+      AF_DOM_TABLE[binderName].push(selector);
+    }
+    return $(selector);
+  }
+
+  nextOp (opName) {
+    if (!opName || opName.length === 0) return this.opsTo;
+    return this.opsTo[opName];
   }
 
   desc (description='...') {
@@ -203,9 +243,11 @@ class Op {
     return this.name;
   }
 
-  run (recursive=false) {
-    this.def();
+  run (caller=null, recursive=false) {
+    this.def(caller);
   }
+
+  def (caller) {}
 
   def (successOp, failOp, constOp) {}
 
@@ -239,8 +281,14 @@ class Op {
     this.action = new Action(action);
   }
 
-  getAction () {
-    if (this.action) return this.action.__a__;
+  getAction (actionKey) {
+    if (this.action) {
+      if (actionKey) {
+        return this.action.__a__[actionKey];
+      }else {
+        return this.action.__a__;
+      }
+    }
     return this.action;
   }
 
@@ -329,11 +377,19 @@ class Trigger extends Op {
     var trig = triggerDict.event || AF_DEFAULT_TRIGGER;
     var $elem = ag.$(selector, this);
     if ($elem.length === 0) return;
-    $elem.on(trig, e => {
-      for (var i = 0; i < this.__opsTo__.length; i++) {
-        var op = this.__opsTo__[i];
-        op.run();
+
+    if (selector === 'body' && trig === 'load') {
+      for (var j = 0; j < this.__opsTo__.length; j++) {
+        ag.reservation_ops.push(this.__opsTo__[j]);
       }
-    });
+    }else {
+      $elem.on(trig, e => {
+        for (var i = 0; i < this.__opsTo__.length; i++) {
+          var op = this.__opsTo__[i];
+          op.triggerParams = e;
+          op.run();
+        }
+      });
+    }
   }
 }

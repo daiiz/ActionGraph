@@ -99,7 +99,9 @@ class ActionGraph {
   }
 
   openBoard () {
-    window.open('/board/index.html', 'ActionGraphBoard', 'width=850, height=600');
+    var r = '';
+    if (window.location.href.indexOf('/ActionGraph/') !== -1) r = '/ActionGraph';
+    window.open(r + '/board/index.html', 'ActionGraphBoard', 'width=850, height=600');
   }
 
   bindEvents () {

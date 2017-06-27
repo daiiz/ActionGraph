@@ -16,7 +16,7 @@ class jQueryAjax extends Op {
       var c = new Const({data: data}, 'fetchedData');
       if (successOp) {
         var op = new successOp('success', [c], self);
-        op.run();
+        op.run(this);
       }
     }).fail(data => {
       var c = new Const({data: data}, 'fetchedData');
@@ -25,6 +25,18 @@ class jQueryAjax extends Op {
         op.run();
       }
     });
+  }
+}
+
+class MyLog extends Op {
+  constructor (name, ops, referrerOp) {super(name, ops, referrerOp);}
+
+  def (caller) {
+    var fetchedData = this.argOps[0];
+    var data = fetchedData.getAction('data');
+    var $msg = this.$('#message');
+    $msg.append(`<div>${data.name}</div>`);
+    console.info(fetchedData);
   }
 }
 
@@ -40,19 +52,18 @@ class PrintOp extends Op {
       var a = refOps[i].getAction();
       if (a) t += a.num;
     }
-    t += 1;
 
     var $elem = ag.$('#result', this);
     var c = new Const({
       url: '/sample/sample.json',
       method: 'GET',
-      data: {'a': 'A'}
+      data: {count: t}
     }, 'requestAPI');
 
     this.addScope(c);
+    this.storeAction({'num': t});
 
     // 非同期処理の書き方
-    this.async(new jQueryAjax('MyAjaxOp', [c], this), Log, Log);
-    this.storeAction({'num': t});
+    this.async(new jQueryAjax('MyAjaxOp', [c], this), MyLog, Log);
   }
 }

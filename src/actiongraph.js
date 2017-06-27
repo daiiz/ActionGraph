@@ -32,7 +32,7 @@ class ActionGraph {
     this.__version__ = '0.0.1';
     this.__global__ = {};
     this.bindEvents();
-    if (window.location.href.endsWith('?dev')) {
+    if (window.location.href.endsWith('?ag')) {
       this.openBoard();
     }
     // 実行予約のOps
@@ -220,10 +220,10 @@ class Op {
           console.warn('同一名称Opへの参照', opName, this.name)
         }
 
-        if (!op.opsTo[name]) {
+        if (!op.opsTo[this.name]) {
           op.opsTo[this.name] = this;
         }else {
-          console.warn('同一名称Opへの参照')
+          console.warn('同一名称Opへの参照', opName, this.name)
         }
     }
   }

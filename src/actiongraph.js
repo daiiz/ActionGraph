@@ -33,7 +33,9 @@ class ActionGraph {
     this.__global__ = {};
     this.bindEvents();
     if (window.location.href.endsWith('?ag')) {
-      this.openBoard();
+      var r = '';
+      if (window.location.href.indexOf('/ActionGraph/') !== -1) r = '/ActionGraph';
+      this.openBoard(r);
     }
     // 実行予約のOps
     // graph構築が完了後runで実行される
@@ -98,9 +100,7 @@ class ActionGraph {
     }
   }
 
-  openBoard () {
-    var r = '';
-    if (window.location.href.indexOf('/ActionGraph/') !== -1) r = '/ActionGraph';
+  openBoard (r='') {
     window.open(r + '/board/index.html', 'ActionGraphBoard', 'width=850, height=600');
   }
 

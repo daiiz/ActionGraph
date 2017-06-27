@@ -54,8 +54,10 @@ class PrintOp extends Op {
     }
 
     var $elem = ag.$('#result', this);
+    var r = '';
+    if (window.location.href.indexOf('/ActionGraph/') !== -1) r = '/ActionGraph';
     var c = new Const({
-      url: '/sample/sample.json',
+      url: r + '/sample/sample.json',
       method: 'GET',
       data: {count: t}
     }, 'requestAPI');
